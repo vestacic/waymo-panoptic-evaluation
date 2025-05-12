@@ -1,0 +1,8 @@
+torch==2.7.0+cu126
+torchmetrics==1.7.1
+torchvision==0.22.0+cu126
+pandas==2.2.3
+matplotlib==3.10.1
+pillow==11.0.0
+scipy==1.15.3
+transformers==4.51.3
