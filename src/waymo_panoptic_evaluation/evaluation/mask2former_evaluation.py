@@ -9,8 +9,8 @@ from transformers import (
     Mask2FormerForUniversalSegmentation,
 )
 
-from waymo_dataset_evaluation import mappings
-from waymo_dataset_evaluation.waymo_dataset import WaymoDataset
+from waymo_panoptic_evaluation import mappings
+from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 
 def evaluate_mask2former(waymo_data_dir: Path) -> None:
