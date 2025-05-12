@@ -171,8 +171,5 @@ WAYMO_THING_CLASSES_IDS = [
     17,
     18,
     19,
-    20,
-    21,
-    22,
 ]
-WAYMO_STUFF_CLASSES_IDS = [23, 24, 25, 26, 0]
+WAYMO_STUFF_CLASSES_IDS = [20, 21, 22, 23, 24, 25, 26, 0]
