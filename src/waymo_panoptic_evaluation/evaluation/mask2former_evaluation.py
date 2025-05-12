@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import cv2
 import torch
 import torchmetrics
 from torch.utils.data import DataLoader
@@ -14,7 +15,7 @@ from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 
 def evaluate_mask2former(waymo_data_dir: Path) -> None:
-    dataset = WaymoDataset(image_directory=waymo_data_dir)
+    dataset = WaymoDataset(image_directory=waymo_data_dir, color_conversion=cv2.COLOR_BGR2RGB)
     dataloader = DataLoader(
         dataset, batch_size=1, shuffle=False, num_workers=4
     )
