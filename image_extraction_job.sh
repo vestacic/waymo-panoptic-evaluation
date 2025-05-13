@@ -8,7 +8,7 @@ DONE_IMAGES_DIR="$HOME/waymo_data/images_processed"
 DONE_SEGMENTATIONS_DIR="$HOME/waymo_data/segmentations_processed"
 PYTHON_SCRIPT="$HOME/src/waymo_panoptic_evaluation/waymo_reader.py"
 
-mkdir -p "$PROCESSING_IMAGES_DIR" "$PROCESSING_SEGMENTATIONS_DIR" "$DONE_IMAGES_DIR"
+mkdir -p "$PROCESSING_IMAGES_DIR" "$PROCESSING_SEGMENTATIONS_DIR" "$DONE_IMAGES_DIR" "$DONE_SEGMENTATIONS_DIR"
 
 for FILE in "$INPUT_IMAGES_DIR"/*; do
     [ -e "$FILE" ] || continue
