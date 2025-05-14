@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Tuple
 
 import cv2
 import numpy as np
@@ -8,7 +7,7 @@ from torch.utils.data import Dataset
 
 
 class WaymoDataset(Dataset):
-    def __init__(self, image_directory: Path, color_conversion = None) -> None:
+    def __init__(self, image_directory: Path, color_conversion=None) -> None:
         self.dir = image_directory
         self.color_conversion = color_conversion
 
@@ -20,7 +19,7 @@ class WaymoDataset(Dataset):
 
     def __getitem__(
         self, idx: int
-    ) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    ) -> tuple[np.ndarray, tuple[np.ndarray, np.ndarray]]:
         item_metadata = self.metadata[idx]
         image_path = self.dir / "images" / item_metadata["image_file_name"]
         panoptic_label_path = (
@@ -31,7 +30,7 @@ class WaymoDataset(Dataset):
         panoptic_label_divisor = item_metadata["panoptic_label_divisor"]
 
         image = cv2.imread(image_path)
-        if self.color_conversion != None:
+        if self.color_conversion is not None:
             image = cv2.cvtColor(image, self.color_conversion)
 
         panoptic_label = cv2.imread(panoptic_label_path, cv2.IMREAD_UNCHANGED)

@@ -343,7 +343,7 @@ ADE20K_TO_WAYMO = {
 }
 
 
-def get_waymo_class_id_from_coco_label(coco_label):
+def get_waymo_class_id_from_coco_label(coco_label: str) -> int:
     waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, 0)
     waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, "undefined")
     return waymo_class_id
