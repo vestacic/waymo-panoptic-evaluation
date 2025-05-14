@@ -5,16 +5,12 @@ import torch
 from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
+from detectron2.data import MetadataCatalog
 from detectron2.modeling import build_model
 from torch.utils.data import DataLoader
 from torchmetrics.detection import PanopticQuality
-from detectron2.data import MetadataCatalog
 
 from waymo_panoptic_evaluation import mappings
-from waymo_panoptic_evaluation.mappings import (
-    WAYMO_STUFF_CLASSES_IDS,
-    WAYMO_THING_CLASSES_IDS,
-)
 from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 
@@ -33,26 +29,18 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     cfg.MODEL.DEVICE = device.type
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
     
-    train_dataset = cfg.DATASETS.TRAIN[0]  # Usually something like "coco_2017_train_panoptic_separated"
-
-    # Retrieve metadata
-    metadata = MetadataCatalog.get(train_dataset)
-
-    # Access thing and stuff classes
+    metadata = MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
     thing_classes = metadata.thing_classes
     stuff_classes = metadata.stuff_classes
-
-    print("Thing classes:", {name: idx for idx, name in enumerate(thing_classes)})
-    print("Stuff classes:", {name: idx for idx, name in enumerate(stuff_classes)})
-
+    
     model = build_model(cfg).to(device)
     DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 
     model.eval()
 
     pq_metric = PanopticQuality(
-        things=WAYMO_THING_CLASSES_IDS,
-        stuffs=WAYMO_STUFF_CLASSES_IDS,
+        things=mappings.WAYMO_THING_CLASSES_IDS,
+        stuffs=mappings.WAYMO_STUFF_CLASSES_IDS,
         return_sq_and_rq=True,
         return_per_class=False,
     ).to(device)
@@ -83,16 +71,14 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 is_thing = segment_info["isthing"]
                 instance_id = segment_info["instance_id"] + 1 if is_thing else 0
 
-                waymo_class_id = mappings.get_waymo_class_id_from_coco(
-                    category_id, is_thing
-                )
+                coco_label = thing_classes[category_id] if is_thing else stuff_classes[category_id]
+                waymo_class_id = mappings.get_waymo_class_id_from_coco_label(coco_label)
                 mask = pred_segmentation_map == segment_id
 
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
 
             pq_metric.update(pred_panoptic_tensor, target_panoptic_tensor)
-            break
 
     final_pq_results = pq_metric.compute()
     print(final_pq_results)
