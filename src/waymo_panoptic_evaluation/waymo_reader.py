@@ -100,7 +100,11 @@ def main(waymo_data_dir: Path) -> None:
     panoptic_labels_dir = waymo_data_dir / "panoptic_labels"
     panoptic_labels_dir.mkdir(parents=True, exist_ok=True)
 
-    metadata = {"data": []}
+    if (waymo_data_dir / "metadata.json").exists():
+        with open(waymo_data_dir / "metadata.json") as fp:
+            metadata = json.load(fp)
+    else:
+        metadata = {"data": []}
 
     for index, row in unique_entries_df.iterrows():
         context = row["key.segment_context_name"]
