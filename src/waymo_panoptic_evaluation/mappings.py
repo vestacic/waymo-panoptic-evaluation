@@ -1,5 +1,25 @@
-WAYMO_THING_CLASSES_IDS=[2, 3, 4, 5, 8, 9, 10, 11]
-WAYMO_STUFF_CLASSES_IDS = [0, 1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+WAYMO_THING_CLASSES_IDS = [2, 3, 4, 5, 8, 9, 10, 11]
+WAYMO_STUFF_CLASSES_IDS = [
+    0,
+    1,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+]
 WAYMO_CLASS_ID_BY_LABEL = {
     "undefined": 0,
     "ego vehicle": 1,
@@ -166,7 +186,7 @@ COCO_LABEL_TO_WAYMO_LABEL = {
     "building": "building",
     "rock": "vegetation",
     "wall": "building",
-    "rug": "static"
+    "rug": "static",
 }
 
 ADE20K_TO_WAYMO = {
@@ -322,7 +342,8 @@ ADE20K_TO_WAYMO = {
     149: 0,  # flag
 }
 
+
 def get_waymo_class_id_from_coco_label(coco_label):
     waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, 0)
-    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, 'undefined')
+    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, "undefined")
     return waymo_class_id

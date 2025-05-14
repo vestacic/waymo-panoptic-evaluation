@@ -28,11 +28,11 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     )
     cfg.MODEL.DEVICE = device.type
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-    
+
     metadata = MetadataCatalog.get(cfg.DATASETS.TRAIN[0])
     thing_classes = metadata.thing_classes
     stuff_classes = metadata.stuff_classes
-    
+
     model = build_model(cfg).to(device)
     DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 
@@ -71,7 +71,11 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 is_thing = segment_info["isthing"]
                 instance_id = segment_info["instance_id"] + 1 if is_thing else 0
 
-                coco_label = thing_classes[category_id] if is_thing else stuff_classes[category_id]
+                coco_label = (
+                    thing_classes[category_id]
+                    if is_thing
+                    else stuff_classes[category_id]
+                )
                 waymo_class_id = mappings.get_waymo_class_id_from_coco_label(coco_label)
                 mask = pred_segmentation_map == segment_id
 
