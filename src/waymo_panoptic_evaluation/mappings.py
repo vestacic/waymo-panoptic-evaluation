@@ -2,6 +2,8 @@ WAYMO_THING_CLASSES_IDS = [2, 3, 4, 5, 8, 9, 10, 11]
 WAYMO_STUFF_CLASSES_IDS = [
     0,
     1,
+    6,
+    7,
     12,
     13,
     14,
@@ -344,6 +346,10 @@ ADE20K_TO_WAYMO = {
 
 
 def get_waymo_class_id_from_coco_label(coco_label: str) -> int:
-    waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, 0)
-    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, "undefined")
+    waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, "undefined")
+    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, 0)
     return waymo_class_id
+
+
+def is_waymo_thing(waymo_class_id: int) -> bool:
+    return waymo_class_id in WAYMO_THING_CLASSES_IDS

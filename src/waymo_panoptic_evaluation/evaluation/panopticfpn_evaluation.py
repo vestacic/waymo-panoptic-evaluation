@@ -16,7 +16,7 @@ from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     dataset = WaymoDataset(image_directory=waymo_data_dir)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=4)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     cfg = get_cfg()
@@ -65,22 +65,28 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
             inputs = [{"image": image, "height": img_height, "width": img_width}]
             pred_segmentation_map, segments_info = model(inputs)[0]["panoptic_seg"]
 
+            instance_id = 1
             for segment_info in segments_info:
                 segment_id = segment_info["id"]
                 category_id = segment_info["category_id"]
-                is_thing = segment_info["isthing"]
-                instance_id = segment_info["instance_id"] + 1 if is_thing else 0
+                is_coco_thing = segment_info["isthing"]
 
                 coco_label = (
                     thing_classes[category_id]
-                    if is_thing
+                    if is_coco_thing
                     else stuff_classes[category_id]
                 )
                 waymo_class_id = mappings.get_waymo_class_id_from_coco_label(coco_label)
                 mask = pred_segmentation_map == segment_id
 
+                is_waymo_thing = mappings.is_waymo_thing(waymo_class_id)
+                instance_id = instance_id if is_waymo_thing else 0
+
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
+
+                if is_waymo_thing:
+                    instance_id += 1
 
             pq_metric.update(pred_panoptic_tensor, target_panoptic_tensor)
 
@@ -93,7 +99,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
 
 if __name__ == "__main__":
     evaluate_panopticfpn(
-        waymo_data_dir=os.environ.get(
-            "WAYMO_DATA_DIR", Path(__file__).parents[3] / "waymo_data"
+        waymo_data_dir=Path(
+            os.environ.get("WAYMO_DATA_DIR", Path(__file__).parents[3] / "waymo_data")
         )
     )
