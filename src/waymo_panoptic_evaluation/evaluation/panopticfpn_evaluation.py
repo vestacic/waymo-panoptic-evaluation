@@ -16,7 +16,7 @@ from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     dataset = WaymoDataset(image_directory=waymo_data_dir)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=4)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     cfg = get_cfg()
@@ -44,16 +44,17 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
         return_sq_and_rq=True,
         return_per_class=False,
     ).to(device)
-
+    
     with torch.no_grad():
-        for image, masks in dataloader:
-            image = image.squeeze(0).permute(2, 0, 1).to(device)
+        for original_image, masks in dataloader:
+            original_image = original_image.squeeze(0)
+            image = original_image.permute(2, 0, 1).to(device)
 
             semantic_mask, instance_mask = masks
             semantic_mask = semantic_mask.squeeze(0).to(device)
             instance_mask = instance_mask.squeeze(0).to(device)
             target_panoptic_tensor = torch.stack(
-                (semantic_mask.squeeze(0), instance_mask.squeeze(0)),
+                (semantic_mask, instance_mask),
                 dim=-1,
             ).to(torch.long)
 
@@ -65,7 +66,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
             inputs = [{"image": image, "height": img_height, "width": img_width}]
             pred_segmentation_map, segments_info = model(inputs)[0]["panoptic_seg"]
 
-            instance_id = 1
+            next_instance_id = 1
             for segment_info in segments_info:
                 segment_id = segment_info["id"]
                 category_id = segment_info["category_id"]
@@ -80,13 +81,12 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 mask = pred_segmentation_map == segment_id
 
                 is_waymo_thing = mappings.is_waymo_thing(waymo_class_id)
-                instance_id = instance_id if is_waymo_thing else 0
+                instance_id = next_instance_id if is_waymo_thing else 0
+                if is_waymo_thing:
+                    next_instance_id += 1
 
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
-
-                if is_waymo_thing:
-                    instance_id += 1
 
             pq_metric.update(pred_panoptic_tensor, target_panoptic_tensor)
 

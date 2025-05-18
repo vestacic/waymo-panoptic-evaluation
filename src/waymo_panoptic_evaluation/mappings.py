@@ -53,6 +53,7 @@ WAYMO_CLASS_ID_BY_LABEL = {
     "dynamic": 27,
     "static": 28,
 }
+WAYMO_CLASS_LABELS = list(WAYMO_CLASS_ID_BY_LABEL.keys())
 
 COCO_LABEL_TO_WAYMO_LABEL = {
     "person": "pedestrian",
@@ -181,7 +182,7 @@ COCO_LABEL_TO_WAYMO_LABEL = {
     "floor": "ground",
     "pavement": "sidewalk",
     "mountain": "vegetation",
-    "grass": "ground",
+    "grass": "vegetation",
     "dirt": "ground",
     "paper": "static",
     "food": "static",
