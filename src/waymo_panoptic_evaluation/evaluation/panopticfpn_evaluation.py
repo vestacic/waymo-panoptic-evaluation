@@ -56,7 +56,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
             target_panoptic_tensor = torch.stack(
                 (semantic_mask, instance_mask),
                 dim=-1,
-            ).to(torch.long)
+            ).to(torch.long).unsqueeze(0)
 
             img_height, img_width = image.shape[-2:]
             pred_panoptic_tensor = torch.zeros(
@@ -88,7 +88,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
 
-            pq_metric.update(pred_panoptic_tensor, target_panoptic_tensor)
+            pq_metric.update(pred_panoptic_tensor.unsqueeze(0), target_panoptic_tensor)
 
     final_pq_results = pq_metric.compute()
     print(final_pq_results)
