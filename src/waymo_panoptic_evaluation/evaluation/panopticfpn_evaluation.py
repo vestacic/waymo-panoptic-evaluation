@@ -16,7 +16,7 @@ from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 
 def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     dataset = WaymoDataset(image_directory=waymo_data_dir)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=4)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     cfg = get_cfg()
