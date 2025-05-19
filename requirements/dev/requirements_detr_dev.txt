@@ -1,7 +1,7 @@
 matplotlib==3.9.3
 numpy==1.26.4
 pillow==11.0.0
-torch==2.6.0
+torch==2.7.0+cu126
 torchmetrics==1.7.1
-torchvision==0.21.0
+torchvision==0.22.0+cu126
 transformers==4.51.3
