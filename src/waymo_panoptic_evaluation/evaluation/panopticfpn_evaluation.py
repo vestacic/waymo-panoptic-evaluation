@@ -21,10 +21,10 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
 
     cfg = get_cfg()
     cfg.merge_from_file(
-        model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml")
+        model_zoo.get_config_file("COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml")
     )
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-        "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml"
+        "COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"
     )
     cfg.MODEL.DEVICE = device.type
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
@@ -56,7 +56,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
             target_panoptic_tensor = torch.stack(
                 (semantic_mask, instance_mask),
                 dim=-1,
-            ).to(torch.long).unsqueeze(0)
+            ).to(torch.long)
 
             img_height, img_width = image.shape[-2:]
             pred_panoptic_tensor = torch.zeros(
@@ -88,7 +88,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
 
-            pq_metric.update(pred_panoptic_tensor.unsqueeze(0), target_panoptic_tensor)
+            pq_metric.update(pred_panoptic_tensor.unsqueeze(0), target_panoptic_tensor.unsqueeze(0))
 
     final_pq_results = pq_metric.compute()
     print(final_pq_results)
