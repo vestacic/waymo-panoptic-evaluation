@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 import torch
@@ -20,7 +21,9 @@ def evaluate_mask2former(waymo_data_dir: Path) -> None:
     )
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model_checkpoint = "facebook/mask2former-swin-large-ade-panoptic"
-    processor = AutoImageProcessor.from_pretrained(model_checkpoint)
+    processor = AutoImageProcessor.from_pretrained(
+        model_checkpoint, use_fast=True
+    )
     model = Mask2FormerForUniversalSegmentation.from_pretrained(
         model_checkpoint
     )
@@ -34,6 +37,7 @@ def evaluate_mask2former(waymo_data_dir: Path) -> None:
         return_per_class=False,
     ).to(device)
 
+    start_time = time.time()
     with torch.no_grad():
         for image, masks in dataloader:
             semantic_mask, instance_mask = masks
@@ -93,11 +97,13 @@ def evaluate_mask2former(waymo_data_dir: Path) -> None:
                 pred_panoptic_tensor.unsqueeze(0),
                 target_panoptic_tensor.unsqueeze(0),
             )
+    end_time = time.time()
     final_pq_results = panoptic_quality_metric.compute()
     print(final_pq_results)
     print(f"Panoptic Quality (PQ): {final_pq_results[0].item():.4f}")
     print(f"Segmentation Quality (SQ): {final_pq_results[1].item():.4f}")
     print(f"Recognition Quality (RQ): {final_pq_results[2].item():.4f}")
+    print(f"Total time spent {end_time-start_time}")
 
 
 if __name__ == "__main__":
