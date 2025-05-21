@@ -1,0 +1,5 @@
+torch==2.4.1
+torchvision==0.19.1
+torchmetrics==1.5.2
+opencv-python==4.11.0.86
+git+https://github.com/facebookresearch/detectron2.git@536dc9d
