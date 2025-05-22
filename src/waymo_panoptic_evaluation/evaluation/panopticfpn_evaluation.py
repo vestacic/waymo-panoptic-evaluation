@@ -114,7 +114,7 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     rq_avg = f"{pq_results_avg[2].item():.4f}"
 
     results = {
-        "duration_in_seconds": duration_in_seconds,
+        "duration_in_seconds": f"{duration_in_seconds:.4f}",
         "metrics_avg": {
             "pq": pq_avg,
             "sq": sq_avg,
