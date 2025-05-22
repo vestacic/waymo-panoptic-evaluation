@@ -1,7 +1,7 @@
 import os
-from pprint import pprint
 import time
 from pathlib import Path
+from pprint import pprint
 
 import torch
 from detectron2 import model_zoo
@@ -94,15 +94,11 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
                 pred_panoptic_tensor[..., 0][mask] = waymo_class_id
                 pred_panoptic_tensor[..., 1][mask] = instance_id
 
+            target_panoptic_tensor = torch.stack(
+                (semantic_mask, instance_mask),
+                dim=-1,
+            ).to(torch.long).unsqueeze(0)
             pred_panoptic_tensor = pred_panoptic_tensor.unsqueeze(0)
-            target_panoptic_tensor = (
-                torch.stack(
-                    (semantic_mask, instance_mask),
-                    dim=-1,
-                )
-                .to(torch.long)
-                .unsqueeze(0)
-            )
 
             pq_metric_avg.update(pred_panoptic_tensor, target_panoptic_tensor)
             pq_metric_per_class.update(pred_panoptic_tensor, target_panoptic_tensor)
