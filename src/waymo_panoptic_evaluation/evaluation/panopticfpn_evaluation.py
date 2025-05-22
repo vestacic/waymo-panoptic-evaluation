@@ -24,11 +24,11 @@ def evaluate_panopticfpn(waymo_data_dir: Path) -> None:
     cfg = get_cfg()
     cfg.merge_from_file(
         model_zoo.get_config_file(
-            "COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"
+            "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml"
         )
     )
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
-        "COCO-PanopticSegmentation/panoptic_fpn_R_101_3x.yaml"
+        "COCO-PanopticSegmentation/panoptic_fpn_R_50_3x.yaml"
     )
     cfg.MODEL.DEVICE = device.type
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
