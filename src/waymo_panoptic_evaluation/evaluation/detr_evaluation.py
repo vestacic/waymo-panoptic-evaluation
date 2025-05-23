@@ -1,19 +1,19 @@
-from transformers import DetrImageProcessor, DetrForSegmentation
-from torchmetrics.detection import PanopticQuality
-from torch.utils.data import DataLoader
-from pathlib import Path
-import torch
 import os
 import time
-
-from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
-from waymo_panoptic_evaluation import mappings
-#from waymo_panoptic_evaluation.mask_visualizer import visualize_masks
-
 import warnings
+from pathlib import Path
+
+import torch
+from torch.utils.data import DataLoader
+from torchmetrics.detection import PanopticQuality
+from transformers import DetrForSegmentation, DetrImageProcessor
+
+from waymo_panoptic_evaluation import mappings
+from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
+
 warnings.filterwarnings("ignore", message=".*copying from a non-meta parameter.*")
 
-def evaluate_detr(dataset_path, output_path="detr_evaluation_results.txt"):
+def evaluate_detr(dataset_path: Path, output_path: str ="detr_evaluation_results.txt") -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[INFO] Running on {device}")
 

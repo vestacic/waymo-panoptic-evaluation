@@ -1,13 +1,20 @@
-import matplotlib.pyplot as plt
-from PIL import Image
-import numpy as np
 import hashlib
+from typing import Dict, Optional, Tuple
 
-def _deterministic_color(label):
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from PIL import Image
+
+def _deterministic_color(label: int) -> Tuple[int, int, int]:
     h = hashlib.sha256(str(label).encode()).digest()
     return tuple(h[:3])
 
-def colorize(mask, instance=None, shared_label_map=None):
+def colorize(
+    mask: torch.Tensor,
+    instance: Optional[torch.Tensor] = None,
+    shared_label_map: Optional[Dict[int, Tuple[int, int, int]]] = None
+) -> Image.Image:
     label_mask = mask.squeeze().cpu().numpy()
 
     if instance is not None:
@@ -32,7 +39,11 @@ def colorize(mask, instance=None, shared_label_map=None):
 
     return Image.fromarray(color_img)
 
-def visualize_masks(gt_sem, gt_inst, pred_sem):
+def visualize_masks(
+    gt_sem: torch.Tensor,
+    gt_inst: torch.Tensor,
+    pred_sem: torch.Tensor
+) -> None:
     gt_colored = colorize(gt_sem, gt_inst)
     pred_colored = colorize(pred_sem[..., 0], pred_sem[..., 1])
 
