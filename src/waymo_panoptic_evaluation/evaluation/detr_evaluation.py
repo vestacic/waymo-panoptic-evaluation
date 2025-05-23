@@ -4,9 +4,11 @@ from torch.utils.data import DataLoader
 from pathlib import Path
 import torch
 import os
+import time
+
 from waymo_panoptic_evaluation.waymo_dataset import WaymoDataset
 from waymo_panoptic_evaluation import mappings
-from waymo_panoptic_evaluation.mask_visualizer import visualize_masks
+#from waymo_panoptic_evaluation.mask_visualizer import visualize_masks
 
 import warnings
 warnings.filterwarnings("ignore", message=".*copying from a non-meta parameter.*")
@@ -32,6 +34,14 @@ def evaluate_detr(dataset_path, output_path="detr_evaluation_results.txt"):
         return_per_class=False,
     ).to(device)
 
+    pq_metric_per_class = PanopticQuality(
+        things=mappings.WAYMO_THING_CLASSES_IDS,
+        stuffs=mappings.WAYMO_STUFF_CLASSES_IDS,
+        return_sq_and_rq=False,
+        return_per_class=True,
+    ).to(device)
+
+    start_time = time.time()
     with torch.no_grad():
         for i, (img, (gt_sem, gt_inst)) in enumerate(dataloader):
             img = img.to(device)
@@ -76,20 +86,37 @@ def evaluate_detr(dataset_path, output_path="detr_evaluation_results.txt"):
                 pred_panoptic_tensor.unsqueeze(0),
                 gt_panoptic_tensor.unsqueeze(0)
             )
+            pq_metric_per_class.update(
+                pred_panoptic_tensor.unsqueeze(0),
+                gt_panoptic_tensor.unsqueeze(0)
+            )
             if (i + 1) % 300 == 0:
                 print(f"[INFO] Processed {i + 1} images...")
 
+    total_time = time.time() - start_time
+
     final_pq = pq_metric.compute()
+
+    per_class_pq = pq_metric_per_class.compute().squeeze(0)
+    all_class_ids = mappings.WAYMO_THING_CLASSES_IDS + mappings.WAYMO_STUFF_CLASSES_IDS
+    per_class_pq_sorted = list(zip(all_class_ids, per_class_pq.tolist()))
+    per_class_pq_sorted.sort(key=lambda x: x[0], reverse=False) 
+
     print("DETR Panoptic Quality Evaluation")
     print(f"PQ: {final_pq[0].item():.4f}")
     print(f"SQ: {final_pq[1].item():.4f}")
     print(f"RQ: {final_pq[2].item():.4f}")
+    print(f"[TIMER] Evaluation loop took {total_time:.2f} seconds")
 
     with open(output_path, "w") as f:
         f.write("DETR Panoptic Quality Evaluation\n")
         f.write(f"PQ: {final_pq[0]:.4f}\n")
         f.write(f"SQ: {final_pq[1]:.4f}\n")
         f.write(f"RQ: {final_pq[2]:.4f}\n")
+        f.write(f"TIMER: Evaluation loop took {total_time:.2f} minutes\n")
+        f.write("\nPer-class Panoptic Quality (Class ID, PQ):\n")
+        for class_id, pq_val in per_class_pq_sorted:
+            f.write(f"{class_id} {pq_val:.4f}\n")
 
     print(f"[INFO] Results saved to {output_path}")
 
