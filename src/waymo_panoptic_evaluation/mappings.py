@@ -2,6 +2,8 @@ WAYMO_THING_CLASSES_IDS = [2, 3, 4, 5, 8, 9, 10, 11]
 WAYMO_STUFF_CLASSES_IDS = [
     0,
     1,
+    6,
+    7,
     12,
     13,
     14,
@@ -20,6 +22,7 @@ WAYMO_STUFF_CLASSES_IDS = [
     27,
     28,
 ]
+WAYMO_CONTINUOUS_IDS = WAYMO_THING_CLASSES_IDS + WAYMO_STUFF_CLASSES_IDS
 WAYMO_CLASS_ID_BY_LABEL = {
     "undefined": 0,
     "ego vehicle": 1,
@@ -51,6 +54,7 @@ WAYMO_CLASS_ID_BY_LABEL = {
     "dynamic": 27,
     "static": 28,
 }
+WAYMO_CLASS_LABELS = list(WAYMO_CLASS_ID_BY_LABEL.keys())
 
 COCO_LABEL_TO_WAYMO_LABEL = {
     "person": "pedestrian",
@@ -179,7 +183,7 @@ COCO_LABEL_TO_WAYMO_LABEL = {
     "floor": "ground",
     "pavement": "sidewalk",
     "mountain": "vegetation",
-    "grass": "ground",
+    "grass": "vegetation",
     "dirt": "ground",
     "paper": "static",
     "food": "static",
@@ -342,12 +346,6 @@ ADE20K_TO_WAYMO = {
     149: 0,  # flag
 }
 
-
-def get_waymo_class_id_from_coco_label(coco_label: str) -> int:
-    waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, 0)
-    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, "undefined")
-    return waymo_class_id
-
 COCO_ID_TO_WAYMO_ID = {
     1: 9,    # person → pedestrian
     2: 6,    # bicycle
@@ -483,3 +481,11 @@ COCO_ID_TO_WAYMO_ID = {
     199: 19, # wall-other-merged → building
     200: 26  # rug-merged → ground
 }
+
+def get_waymo_class_id_from_coco_label(coco_label: str) -> int:
+    waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, "undefined")
+    waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, 0)
+    return waymo_class_id
+
+def is_waymo_thing(waymo_class_id: int) -> bool:
+    return waymo_class_id in WAYMO_THING_CLASSES_IDS
