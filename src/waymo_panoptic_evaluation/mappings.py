@@ -346,12 +346,146 @@ ADE20K_TO_WAYMO = {
     149: 0,  # flag
 }
 
+COCO_ID_TO_WAYMO_ID = {
+    1: 9,    # person → pedestrian
+    2: 6,    # bicycle
+    3: 2,    # car
+    4: 7,    # motorcycle
+    5: 5,    # airplane → other large vehicle
+    6: 4,    # bus
+    7: 5,    # train → other large vehicle
+    8: 3,    # truck
+    9: 5,    # boat → other large vehicle
+    10: 18,  # traffic light
+    11: 28,  # fire hydrant → static
+    13: 17,  # stop sign → sign
+    14: 28,  # parking meter → static
+    15: 28,  # bench → static
+    16: 12,  # bird
+    17: 13,  # cat → ground animal
+    18: 13,  # dog → ground animal
+    19: 13,  # horse → ground animal
+    20: 13,  # sheep → ground animal
+    21: 13,  # cow → ground animal
+    22: 13,  # elephant → ground animal
+    23: 13,  # bear → ground animal
+    24: 13,  # zebra → ground animal
+    25: 13,  # giraffe → ground animal
+    27: 16,  # backpack → pedestrian object
+    28: 16,  # umbrella → pedestrian object
+    31: 16,  # handbag → pedestrian object
+    32: 16,  # tie → pedestrian object
+    33: 16,  # suitcase → pedestrian object
+    34: 16,  # frisbee → pedestrian object
+    35: 16,  # skis → pedestrian object
+    36: 16,  # snowboard → pedestrian object
+    37: 16,  # sports ball → pedestrian object
+    38: 16,  # kite → pedestrian object
+    39: 16,  # baseball bat → pedestrian object
+    40: 16,  # baseball glove → pedestrian object
+    41: 16,  # skateboard → pedestrian object
+    42: 16,  # surfboard → pedestrian object
+    43: 16,  # tennis racket → pedestrian object
+    44: 16,  # bottle → pedestrian object
+    46: 16,  # wine glass → pedestrian object
+    47: 16,  # cup → pedestrian object
+    48: 16,  # fork → pedestrian object
+    49: 16,  # knife → pedestrian object
+    50: 16,  # spoon → pedestrian object
+    51: 16,  # bowl → pedestrian object
+    52: 16,  # banana → pedestrian object
+    53: 16,  # apple → pedestrian object
+    54: 16,  # sandwich → pedestrian object
+    55: 16,  # orange → pedestrian object
+    56: 16,  # broccoli → pedestrian object
+    57: 16,  # carrot → pedestrian object
+    58: 16,  # hot dog → pedestrian object
+    59: 16,  # pizza → pedestrian object
+    60: 16,  # donut → pedestrian object
+    61: 16,  # cake → pedestrian object
+    62: 28,  # chair → static
+    63: 28,  # couch → static
+    64: 24,  # potted plant → vegetation
+    65: 28,  # bed → static
+    67: 28,  # dining table → static
+    70: 28,  # toilet → static
+    72: 28,  # tv → static
+    73: 28,  # laptop → static
+    74: 28,  # mouse → static
+    75: 28,  # remote → static
+    76: 28,  # keyboard → static
+    77: 16,  # cell phone → pedestrian object
+    78: 28,  # microwave → static
+    79: 28,  # oven → static
+    80: 28,  # toaster → static
+    81: 28,  # sink → static
+    82: 28,  # refrigerator → static
+    84: 16,  # book → pedestrian object
+    85: 16,  # clock → pedestrian object
+    86: 28,  # vase → static
+    87: 16,  # scissors → pedestrian object
+    88: 16,  # teddy bear → pedestrian object
+    89: 16,  # hair drier → pedestrian object
+    90: 16,  # toothbrush → pedestrian object
+    92: 17,  # banner → sign
+    93: 28,  # blanket → static
+    95: 19,  # bridge → building
+    100: 28, # cardboard → static
+    107: 28, # counter → static
+    109: 28, # curtain → static
+    112: 19, # door-stuff → building
+    118: 26, # floor-wood → ground
+    119: 24, # flower → vegetation
+    122: 28, # fruit → static
+    125: 26, # gravel → ground
+    128: 19, # house → building
+    130: 28, # light → static
+    133: 19, # mirror-stuff → building
+    138: 28, # net → static
+    141: 28, # pillow → static
+    144: 19, # platform → building
+    145: 20, # playingfield → road
+    147: 20, # railroad → road
+    148: 26, # river → ground
+    149: 20, # road
+    151: 19, # roof → building
+    154: 26, # sand → ground
+    155: 26, # sea → ground
+    156: 28, # shelf → static
+    159: 26, # snow → ground
+    161: 19, # stairs → building
+    166: 19, # tent → building
+    168: 28, # towel → static
+    171: 19, # wall-brick → building
+    175: 19, # wall-stone → building
+    176: 19, # wall-tile → building
+    177: 19, # wall-wood → building
+    178: 26, # water-other → ground
+    180: 19, # window-blind → building
+    181: 19, # window-other → building
+    184: 24, # tree-merged → vegetation
+    185: 19, # fence-merged → building
+    186: 19, # ceiling-merged → building
+    187: 25, # sky-other-merged → sky
+    188: 19, # cabinet-merged → building
+    189: 19, # table-merged → building
+    190: 26, # floor-other-merged → ground
+    191: 23, # pavement-merged → sidewalk
+    192: 26, # mountain-merged → ground
+    193: 24, # grass-merged → vegetation
+    194: 26, # dirt-merged → ground
+    195: 28, # paper-merged → static
+    196: 28, # food-other-merged → static
+    197: 19, # building-other-merged → building
+    198: 26, # rock-merged → ground
+    199: 19, # wall-other-merged → building
+    200: 26  # rug-merged → ground
+}
 
 def get_waymo_class_id_from_coco_label(coco_label: str) -> int:
     waymo_label = COCO_LABEL_TO_WAYMO_LABEL.get(coco_label, "undefined")
     waymo_class_id = WAYMO_CLASS_ID_BY_LABEL.get(waymo_label, 0)
     return waymo_class_id
-
 
 def is_waymo_thing(waymo_class_id: int) -> bool:
     return waymo_class_id in WAYMO_THING_CLASSES_IDS
